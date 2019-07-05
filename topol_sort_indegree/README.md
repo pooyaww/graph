@@ -1,1 +1,1 @@
-![topological-sort.png](Dragster.jpg)
+![topological-sort](topological-sort.png)
