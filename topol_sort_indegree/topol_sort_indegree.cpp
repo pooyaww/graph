@@ -5,7 +5,7 @@ typedef struct {
     unsigned int first;
     unsigned int second;
 } arc;
- 
+
 /* Find out if a vertex has no incoming arcs */
 static unsigned int is_root(const arc *graph, const unsigned int *arcs, unsigned int size,
         unsigned int v)
@@ -16,7 +16,7 @@ static unsigned int is_root(const arc *graph, const unsigned int *arcs, unsigned
     }
     return root;
 }
- 
+
 /* Get the vertices with no incoming arcs */
 static unsigned int get_roots(const arc *graph, const unsigned int *arcs, unsigned int size,
         unsigned int order, unsigned int *vertices)
@@ -30,8 +30,8 @@ static unsigned int get_roots(const arc *graph, const unsigned int *arcs, unsign
     }
     return vertices_size;
 }
- 
-unsigned int topological_sort(const arc *graph, unsigned int size, unsigned int order, 
+
+unsigned int topological_sort(const arc *graph, unsigned int size, unsigned int order,
         unsigned int **sorted)
 {
     unsigned int *vertices = calloc(order, sizeof(unsigned int));
@@ -71,7 +71,7 @@ unsigned int topological_sort(const arc *graph, unsigned int size, unsigned int 
                     /* Add it to set of vertices */
                     vertices[graph[a].second] = 1;
                     vertices_size++;
-                } 
+                }
             }
         }
     }
@@ -80,16 +80,17 @@ unsigned int topological_sort(const arc *graph, unsigned int size, unsigned int 
     return arcs_size == 0;
 }
 
- 
+
 /* Connect two arcs */
-void arc_connect(arc *arcs, unsigned int first, unsigned int second, 
+// we store thre arcs connections instead of conventional methods which keep tracks of nodes in adj-list
+void arc_connect(arc *arcs, unsigned int first, unsigned int second,
         unsigned int *pos)
 {
     arcs[*pos].first = first;
     arcs[*pos].second = second;
     (*pos)++;
 }
- 
+
 int main(void)
 {
     const unsigned int size = 8; /* Arcs */
@@ -98,7 +99,7 @@ int main(void)
     unsigned int i = 0;
     unsigned int *sorted;
     unsigned int acyclic;
- 
+
     arc_connect(arcs, 0, 2, &i);
     arc_connect(arcs, 1, 3, &i);
     arc_connect(arcs, 2, 3, &i);
@@ -107,17 +108,17 @@ int main(void)
     arc_connect(arcs, 3, 6, &i);
     arc_connect(arcs, 5, 7, &i);
     arc_connect(arcs, 5, 7, &i);
- 
+
     acyclic = topological_sort(arcs, size, order, &sorted);
     printf("Graph is acyclic: %u\n", acyclic);
     for (i = 0; i < order; i++) {
         printf("%u ", sorted[i]);
     }
     putchar('\n');
- 
+
     free(sorted);
     free(arcs);
- 
+
     return 0;
 }
 
