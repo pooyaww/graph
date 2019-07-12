@@ -10,8 +10,8 @@ typedef struct {
 static unsigned int is_free_kernel(const dependence *dependencies, const unsigned int *from_to, unsigned int num_of_dependencies,
         unsigned int kernel)
 {
-    unsigned int a, free_kernel = 1;
-    for (from_this_kernel = 0; a < num_of_dependencies && free_kernel; from_this_kernel++) {
+    unsigned int from_this_kernel, free_kernel = 1;
+    for (from_this_kernel = 0; from_this_kernel < num_of_dependencies && free_kernel; from_this_kernel++) {
         free_kernel = !from_to[from_this_kernel] || dependencies[from_this_kernel].to != kernel;
     }
     return free_kernel;
@@ -21,7 +21,7 @@ static unsigned int is_free_kernel(const dependence *dependencies, const unsigne
 static unsigned int get_free_kernels(const dependence *dependencies, const unsigned int *from_to, unsigned int num_of_dependencies,
         unsigned int num_of_kernels, unsigned int *free_kernels)
 {
-    unsigned int v, num_of_free_kernels = 0;
+    unsigned int kernel, num_of_free_kernels = 0;
     for (kernel = 0; kernel < num_of_kernels; kernel++) {
         if (is_free_kernel(dependencies, from_to, num_of_dependencies, kernel)) {
             free_kernels[kernel] = 1;
@@ -34,9 +34,9 @@ static unsigned int get_free_kernels(const dependence *dependencies, const unsig
 unsigned int topological_sort(const dependence *dependencies, unsigned int num_of_dependencies, unsigned int num_of_kernels,
         unsigned int **sorted)
 {
-    unsigned int *boolean_vector_of_free_kernels = calloc(order, sizeof(unsigned int));
-    unsigned int *boolean_vector_of_dependencies = malloc(size * sizeof(unsigned int));
-    *sorted = malloc(order * sizeof(unsigned int));
+    unsigned int *free_kernels = calloc(num_of_kernels, sizeof(unsigned int));
+    unsigned int *boolean_vector_of_dependencies = malloc(num_of_dependencies * sizeof(unsigned int));
+    *sorted = malloc( num_of_kernels* sizeof(unsigned int));
     unsigned int kernel, a, num_of_free_kernels, sorted_size = 0,
             arcs_size = num_of_dependencies;
 //    if (!(vertices && arcs && *sorted)) {
@@ -47,7 +47,7 @@ unsigned int topological_sort(const dependence *dependencies, unsigned int num_o
 //        return 0;
 //    }
     /* All arcs start off in the graph */
-    for (a = 0; a < size; a++) {
+    for (a = 0; a < num_of_dependencies; a++) {
         boolean_vector_of_dependencies[a] = 1;
     }
     /* Get the vertices with no incoming edges */
@@ -69,13 +69,13 @@ unsigned int topological_sort(const dependence *dependencies, unsigned int num_o
                 /* Check if neighbour is now a root */
                 if (is_free_kernel(dependencies, boolean_vector_of_dependencies, num_of_dependencies, dependencies[a].to)) {
                     /* Add it to set of vertices */
-                    boolean_vector_of_free_kernels[dependencies[a].to] = 1;
+                    free_kernels[dependencies[a].to] = 1;
                     num_of_free_kernels++;
                 }
             }
         }
     }
-    free(boolean_vector_of_free_kernels);
+    free(free_kernels);
     free(boolean_vector_of_dependencies);
     return arcs_size == 0;
 }
