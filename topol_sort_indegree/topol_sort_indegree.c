@@ -101,7 +101,8 @@ int main(void)
     unsigned int *resolved;
     unsigned int acyclic;
 
-    //Making dependencies (making an array of kernel dependencies)
+    // Dependencies should be determined by an analyse phase on kernels
+    // Making dependencies (making an array of kernel dependencies)
     kernel_dependency(dependencies, 0, 2, &i);
     kernel_dependency(dependencies, 1, 3, &i);
     kernel_dependency(dependencies, 2, 3, &i);
