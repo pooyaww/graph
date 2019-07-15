@@ -9,8 +9,7 @@ typedef struct {
 
 /* Find out if a kernel has no dependency (no input from other kernels to this one) */
 static bool is_free_kernel(const dependence *dependencies, bool *dependency_bool_vector, unsigned int num_of_dependencies,
-        unsigned int kernel)
-{
+                           unsigned int kernel) {
     unsigned int from_this_kernel, free_kernel = 1;
     for (from_this_kernel = 0; from_this_kernel < num_of_dependencies && free_kernel; from_this_kernel++) {
         free_kernel = !dependency_bool_vector[from_this_kernel] || dependencies[from_this_kernel].to != kernel;
@@ -20,8 +19,7 @@ static bool is_free_kernel(const dependence *dependencies, bool *dependency_bool
 
 /* Get the kernels with no dependency (no input from other kernels to those) */
 static unsigned int get_free_kernels(const dependence *dependencies, bool *dependency_bool_vector, unsigned int num_of_dependencies,
-        unsigned int num_of_kernels, bool *free_kernels_bool_vector)
-{
+                                     unsigned int num_of_kernels, bool *free_kernels_bool_vector) {
     unsigned int kernel, num_of_free_kernels = 0;
     for (kernel = 0; kernel < num_of_kernels; kernel++) {
         if (is_free_kernel(dependencies, dependency_bool_vector, num_of_dependencies, kernel)) {
@@ -33,20 +31,19 @@ static unsigned int get_free_kernels(const dependence *dependencies, bool *depen
 }
 
 unsigned int topological_sort(const dependence *dependencies, unsigned int num_of_dependencies, unsigned int num_of_kernels,
-        unsigned int **resolved)
-{
-    bool *free_kernels_bool_vector = calloc(num_of_kernels, sizeof(bool));
-    bool *dependency_bool_vector = malloc(num_of_dependencies * sizeof(bool));
-    *resolved = malloc( num_of_kernels* sizeof(unsigned int));
-    unsigned int kernel, a, num_of_free_kernels, sorted_size = 0,
-            arcs_size = num_of_dependencies;
-//    if (!(vertices && arcs && *sorted)) {
-//        free(vertices);
-//        free(arcs);
-//        free(*sorted);
-//        *sorted = NULL;
-//        return 0;
-//    }
+                              unsigned int **resolved) {
+    bool *free_kernels_bool_vector = (bool*) calloc(num_of_kernels, sizeof(bool));
+    bool *dependency_bool_vector = (bool*) malloc(num_of_dependencies * sizeof(bool));
+    *resolved = (unsigned int *)malloc( num_of_kernels* sizeof(unsigned int));
+    unsigned int kernel, a, num_of_free_kernels, resolved_size = 0,
+                 arcs_size = num_of_dependencies;
+    if (!(free_kernels_bool_vector && dependency_bool_vector && *resolved)) {
+        free(free_kernels_bool_vector);
+        free(dependency_bool_vector);
+        free(*resolved);
+        *resolved = NULL;
+        return 0;
+    }
     /* All arcs start off in the graph */
     for (a = 0; a < num_of_dependencies; a++) {
         dependency_bool_vector[a] = 1;
@@ -57,14 +54,14 @@ unsigned int topological_sort(const dependence *dependencies, unsigned int num_o
     while (num_of_free_kernels > 0) {
         /* Get first vertex */
         for (kernel = 0; free_kernels_bool_vector[kernel] != 1; kernel++);
-        /* Remove from vertex set */
+        /* Remove from free_kernels boolian vector */
         free_kernels_bool_vector[kernel] = 0;
         num_of_free_kernels--;
-        /* Add it to the sorted array */
-        (*resolved)[sorted_size++] = kernel;
+        /* Add it to the resolved array */
+        (*resolved)[resolved_size++] = kernel;
         /* Remove all arcs connecting it to its neighbours */
         for (a = 0; a < num_of_dependencies; a++) {
-            if (dependency_bool_vector[a] && dependencies[a].from== kernel) {
+            if (dependency_bool_vector[a] && dependencies[a].from == kernel) {
                 dependency_bool_vector[a] = 0;
                 arcs_size--;
                 /* Check if neighbour is now a root */
@@ -85,18 +82,16 @@ unsigned int topological_sort(const dependence *dependencies, unsigned int num_o
 /* Connect two arcs */
 // we store thre arcs connections instead of conventional methods which keep tracks of nodes in adj-list
 void kernel_dependency(dependence *from_to, unsigned int from, unsigned int to,
-        unsigned int *index)
-{
+                       unsigned int *index) {
     from_to[*index].from = from;
     from_to[*index].to = to;
     (*index)++;
 }
 
-int main(void)
-{
+int main(void) {
     const unsigned int num_of_dependencies = 8; /* number of dependencies */
     const unsigned int num_of_kernels = 8; /* number of kernels */
-    dependence *dependencies = malloc(num_of_dependencies * sizeof(dependence)); // Array for kernel dependencies
+    dependence *dependencies = (dependence*) malloc(num_of_dependencies * sizeof(dependence)); // Array for kernel dependencies
     unsigned int i = 0;
     unsigned int *resolved;
     unsigned int acyclic;
@@ -125,4 +120,3 @@ int main(void)
 
     return 0;
 }
-
