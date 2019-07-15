@@ -1,6 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
+#include <iostream>
 
 typedef struct {
     unsigned int from;
@@ -18,7 +16,7 @@ static bool is_free_kernel(const dependence *dependencies, bool *dependency_bool
 }
 
 /* Get the kernels with no dependency (no input from other kernels to those) */
-static unsigned int get_free_kernels(const dependence *dependencies, bool *dependency_bool_vector, unsigned int num_of_dependencies,
+static size_t get_free_kernels(const dependence *dependencies, bool *dependency_bool_vector, unsigned int num_of_dependencies,
                                      unsigned int num_of_kernels, bool *free_kernels_bool_vector) {
     unsigned int kernel, num_of_free_kernels = 0;
     for (kernel = 0; kernel < num_of_kernels; kernel++) {
@@ -30,7 +28,7 @@ static unsigned int get_free_kernels(const dependence *dependencies, bool *depen
     return num_of_free_kernels;
 }
 
-unsigned int topological_sort(const dependence *dependencies, unsigned int num_of_dependencies, unsigned int num_of_kernels,
+size_t topological_sort(const dependence *dependencies, unsigned int num_of_dependencies, unsigned int num_of_kernels,
                               unsigned int **resolved) {
     bool *free_kernels_bool_vector = (bool*) calloc(num_of_kernels, sizeof(bool));
     bool *dependency_bool_vector = (bool*) malloc(num_of_dependencies * sizeof(bool));
@@ -109,7 +107,7 @@ int main(void) {
 
     //Passing array of dependencies
     acyclic = topological_sort(dependencies, num_of_dependencies, num_of_kernels, &resolved);
-    printf("No cycle between kernels: %u\n", acyclic);
+    std::cout<< "No cycle between kernels: "<< acyclic;
     for (i = 0; i < num_of_kernels; i++) {
         printf("%u ", resolved[i]);
     }
