@@ -1,6 +1,6 @@
 ### Finding the order of process execuation via in-degree of vertices  
 
-![topological-sort](kernel_dependencies.png)
+![kernel_dependencies](kernel_dependencies.png)
 
 
 ```
