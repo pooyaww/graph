@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <utility>
-#include <array>
 
 using Dependence = std::pair<size_t, size_t>; // <from, to>
 
