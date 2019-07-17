@@ -35,12 +35,12 @@ size_t topological_sort(Dependence dependencies[], size_t num_of_dependencies, s
            remaining_dependencies = num_of_dependencies;
 
     /* All arcs start off in the graph */
-    //    for (a = 0; a < num_of_dependencies; a++ ) {
-    //        dependency_bool_vector[a]=true;
-    //    }
-    for (auto elem : dependency_bool_vector ) {
-        elem = true;
-    }
+        for (a = 0; a < num_of_dependencies; a++ ) {
+            dependency_bool_vector[a]=true;
+        }
+//    for (auto elem : dependency_bool_vector ) {
+//        elem = true;
+//    }
     /* Get the kernels with no incoming dependencies */
     num_of_free_kernels = get_free_kernels(dependencies, dependency_bool_vector, num_of_dependencies, num_of_kernels, free_kernels_bool_vector);
     /* Main loop */
@@ -62,7 +62,7 @@ size_t topological_sort(Dependence dependencies[], size_t num_of_dependencies, s
                 /* Check if neighbour is now a root */
                 if (is_free_kernel(dependencies, dependency_bool_vector, num_of_dependencies, dependencies[a].second)) {
                     /* Add it to set of vertices */
-                    free_kernels_bool_vector[dependencies[a].second] = 1;
+                    free_kernels_bool_vector[dependencies[a].second] = true;
                     num_of_free_kernels++;
                 }
             }
@@ -71,9 +71,10 @@ size_t topological_sort(Dependence dependencies[], size_t num_of_dependencies, s
         return remaining_dependencies == 0;
     }
 
-    void kernel_dependency(Dependence dependence[], size_t from, size_t to, size_t* index) {
-        dependence[*index] = {std::make_pair(from,to)};
-        (*index)++;
+    void kernel_dependency(Dependence dependence[], size_t from, size_t to, size_t& index) {
+        dependence[index] = {std::make_pair(from, to)};
+        std::cout << dependence[index].first << " ----> " << dependence[index].second << std::endl;
+        index++;
     }
 
     int main(void) {
