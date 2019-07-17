@@ -27,7 +27,7 @@ static size_t get_free_kernels(Dependence dependencies[], bool dependency_bool_v
     return num_of_free_kernels;
 }
 
-size_t topological_sort(Dependence dependencies[], size_t num_of_dependencies, size_t num_of_kernels, std::vector<size_t>& resolved) {
+bool topological_sort(Dependence dependencies[], size_t num_of_dependencies, size_t num_of_kernels, std::vector<size_t>& resolved) {
     bool free_kernels_bool_vector[num_of_kernels];
     bool dependency_bool_vector[num_of_dependencies];
     //std::vector<size_t> resolved;
@@ -35,12 +35,9 @@ size_t topological_sort(Dependence dependencies[], size_t num_of_dependencies, s
            remaining_dependencies = num_of_dependencies;
 
     /* All arcs start off in the graph */
-        for (a = 0; a < num_of_dependencies; a++ ) {
-            dependency_bool_vector[a]=true;
-        }
-//    for (auto elem : dependency_bool_vector ) {
-//        elem = true;
-//    }
+    for (a = 0; a < num_of_dependencies; a++ ) {
+        dependency_bool_vector[a]=true;
+    }
     /* Get the kernels with no incoming dependencies */
     num_of_free_kernels = get_free_kernels(dependencies, dependency_bool_vector, num_of_dependencies, num_of_kernels, free_kernels_bool_vector);
     /* Main loop */
@@ -82,7 +79,6 @@ size_t topological_sort(Dependence dependencies[], size_t num_of_dependencies, s
         const size_t num_of_kernels = 4;//8; /* number of kernels */
         Dependence dependencies[num_of_dependencies]; // vector for kernel dependencies
         std::vector<size_t> resolved;
-        size_t acyclic;
         size_t index = 0;
 
         // Dependencies should be determined by an analyse phase on kernels
@@ -97,9 +93,11 @@ size_t topological_sort(Dependence dependencies[], size_t num_of_dependencies, s
         //kernel_dependency(dependencies, 5, 7, index);
 
         //Passing vector of dependencies
-        acyclic = topological_sort(dependencies, num_of_dependencies, num_of_kernels, resolved);
-        std::cout<< "No cycle between kernels: "<< acyclic << std::endl;
-        for (auto& elem : resolved) {
+        if ( topological_sort(dependencies, num_of_dependencies, num_of_kernels, resolved))
+            std::cout<< "No cycles between kernels"<< std::endl;
+        else
+            std::cout<< "Kernels have circular dependency"<< std::endl;
+        for (auto elem : resolved) {
             std::cout<< elem <<" ";
         }
         std::cout<<std::endl;
