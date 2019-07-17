@@ -46,7 +46,7 @@ size_t topological_sort(Dependence dependencies[], size_t num_of_dependencies, s
     /* Main loop */
     while (num_of_free_kernels > 0) {
         /* Get first kernel */
-        for (kernel = 0; free_kernels_bool_vector[kernel] != 1; kernel++);
+        for (kernel = 0; free_kernels_bool_vector[kernel] != true; kernel++);
         /* Remove from free_kernels boolean vector */
         free_kernels_bool_vector[kernel] = false;
         num_of_free_kernels--;
