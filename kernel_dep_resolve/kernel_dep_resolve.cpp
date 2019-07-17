@@ -87,14 +87,14 @@ size_t topological_sort(Dependence dependencies[], size_t num_of_dependencies, s
 
         // Dependencies should be determined by an analyse phase on kernels
         // Making dependencies (making an array of kernel dependencies)
-        kernel_dependency(dependencies, 0, 2, &index);
-        kernel_dependency(dependencies, 2, 1, &index);
-        kernel_dependency(dependencies, 2, 3, &index);
-        //kernel_dependency(dependencies, 2, 4);
-        //kernel_dependency(dependencies, 2, 5);
-        //kernel_dependency(dependencies, 3, 6);
-        //kernel_dependency(dependencies, 5, 7);
-        //kernel_dependency(dependencies, 5, 7);
+        kernel_dependency(dependencies, 0, 2, index);
+        kernel_dependency(dependencies, 2, 1, index);
+        kernel_dependency(dependencies, 2, 3, index);
+        //kernel_dependency(dependencies, 2, 4, index);
+        //kernel_dependency(dependencies, 2, 5, index);
+        //kernel_dependency(dependencies, 3, 6, index);
+        //kernel_dependency(dependencies, 5, 7, index);
+        //kernel_dependency(dependencies, 5, 7, index);
 
         //Passing vector of dependencies
         acyclic = topological_sort(dependencies, num_of_dependencies, num_of_kernels, resolved);
