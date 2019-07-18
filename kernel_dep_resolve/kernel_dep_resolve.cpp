@@ -5,17 +5,17 @@
 using Dependence = std::pair<size_t, size_t>; // <from, to>
 
 /* Find out if a kernel has no dependency (no input from other kernels to this one) */
-static bool is_free_kernel(const Dependence dependencies[], const bool dependency_bool_vector[], size_t num_of_dependencies,
+static bool is_free_kernel(const Dependence dependencies[], const bool dependency_bool_vector[], const size_t num_of_dependencies,
                            size_t kernel) {
     bool free_kernel = 1;
     for (int i = 0; i < num_of_dependencies && free_kernel; i++) {
-        free_kernel = !dependency_bool_vector[i] || dependencies[i].second != kernel;
+        free_kernel = (!dependency_bool_vector[i])|| (dependencies[i].second != kernel);
     }
     return free_kernel;
 }
 
 /* Get the kernels with no dependency (no input from other kernels to those) */
-static size_t get_free_kernels(Dependence dependencies[], bool dependency_bool_vector[] , size_t num_of_dependencies,
+static size_t get_free_kernels(const Dependence dependencies[], const bool dependency_bool_vector[], const size_t num_of_dependencies,
                                size_t num_of_kernels, bool free_kernels_bool_vector[]) {
     size_t kernel, num_of_free_kernels = 0;
     for (kernel = 0; kernel < num_of_kernels; kernel++) {
@@ -27,12 +27,11 @@ static size_t get_free_kernels(Dependence dependencies[], bool dependency_bool_v
     return num_of_free_kernels;
 }
 
-bool topological_sort(Dependence dependencies[], size_t num_of_dependencies, size_t num_of_kernels, std::vector<size_t>& resolved) {
+bool topological_sort(Dependence dependencies[], const size_t num_of_dependencies, const size_t num_of_kernels, std::vector<size_t>& resolved) {
     bool free_kernels_bool_vector[num_of_kernels];
     bool dependency_bool_vector[num_of_dependencies];
-    //std::vector<size_t> resolved;
-    size_t kernel, a, num_of_free_kernels, resolved_size = 0,
-           remaining_dependencies = num_of_dependencies;
+    size_t kernel, a, num_of_free_kernels, resolved_size = 0;
+    size_t remaining_dependencies = num_of_dependencies;
 
     /* in the begining all dependencies are marked */
     for (a = 0; a < num_of_dependencies; a++ ) {
@@ -67,9 +66,9 @@ bool topological_sort(Dependence dependencies[], size_t num_of_dependencies, siz
         return remaining_dependencies == 0;
     }
 
-    void kernel_dependency(Dependence dependence[], size_t from, size_t to, size_t& index) {
-        dependence[index] = {std::make_pair(from, to)};
-        std::cout << dependence[index].first << " ----> " << dependence[index].second << std::endl;
+    void kernel_dependency(Dependence dependencies[],const size_t from, const size_t to, size_t& index) {
+        dependencies[index] = {std::make_pair(from, to)};
+        std::cout << dependencies[index].first << " ----> " << dependencies[index].second << std::endl;
         index++;
     }
 
