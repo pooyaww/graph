@@ -1,21 +1,19 @@
 #include <iostream>
 #include <vector>
-//#include <utility>
-#include <map>
 
 using Dependence = std::pair<size_t, size_t>; // <from, to>
 
-/* Find out if a kernel has no dependency (no input from other kernels to this one) */
+// Find out if a kernel has no dependency (no input from other kernels to this one)
 static bool is_free_kernel(const Dependence dependencies[], const bool dependency_bool_vector[], const size_t num_of_dependencies,
                            size_t kernel) {
-    bool free_kernel = 1;
-    for (int i = 0; i < num_of_dependencies && free_kernel; ++i) {
+    bool free_kernel = true;
+    for (size_t i = 0; i < num_of_dependencies && free_kernel; ++i) {
         free_kernel = (!dependency_bool_vector[i])|| (dependencies[i].second != kernel);
     }
     return free_kernel;
 }
 
-/* Get the kernels with no dependency (no input from other kernels to those) */
+// Get the kernels with no dependency (no input from other kernels to those)
 static size_t get_free_kernels(const Dependence dependencies[], const bool dependency_bool_vector[], const size_t num_of_dependencies,
                                size_t num_of_kernels, bool free_kernels_bool_vector[]) {
     size_t  num_of_free_kernels = 0;
@@ -28,36 +26,37 @@ static size_t get_free_kernels(const Dependence dependencies[], const bool depen
     return num_of_free_kernels;
 }
 
-bool topological_sort(Dependence dependencies[], const size_t num_of_dependencies, const size_t num_of_kernels, std::vector<size_t>& resolved) {
+bool topological_sort(Dependence dependencies[], const size_t num_of_dependencies, const size_t num_of_kernels, std::vector<int>& resolved) {
     bool free_kernels_bool_vector[num_of_kernels];
     bool dependency_bool_vector[num_of_dependencies];
-    size_t kernel, num_of_free_kernels, resolved_size = 0;
+    size_t num_of_free_kernels, resolved_size = 0;
     size_t remaining_dependencies = num_of_dependencies;
 
-    /* in the begining all dependencies are marked */
+    // in the begining all dependencies are marked
     for (int i = 0; i < num_of_dependencies; ++i ) {
         dependency_bool_vector[i] = true;
     }
-    /* Get the kernels with no incoming dependencies */
+    // Get the kernels with no incoming dependencies
     num_of_free_kernels = get_free_kernels(dependencies, dependency_bool_vector, num_of_dependencies, num_of_kernels, free_kernels_bool_vector);
-    /* Main loop */
+    // Main loop
     while (num_of_free_kernels > 0) {
-        /* Get first kernel */
+        // Get first kernel
+        size_t kernel;
         for (kernel = 0; free_kernels_bool_vector[kernel] != true; ++kernel);
-        /* Remove from free_kernels boolean vector */
+        // Remove from free_kernels boolean vector
         free_kernels_bool_vector[kernel] = false;
         num_of_free_kernels--;
-        /* Add it to the resolved array */
+        // Add it to the resolved array
         resolved.emplace_back(kernel);
         resolved_size++;
-        /* Remove all dependencies with other kernels */
+        // Remove all dependencies with other kernels
         for (int i = 0; i < num_of_dependencies; ++i) {
             if (dependency_bool_vector[i] && dependencies[i].first == kernel) {
                 dependency_bool_vector[i] = false;
                 remaining_dependencies--;
-                /* Check if other kernels are free now */
+                // Check if other kernels are free now
                 if (is_free_kernel(dependencies, dependency_bool_vector, num_of_dependencies, dependencies[i].second)) {
-                    /* Add it to set of free kernels */
+                    // Add it to set of free kernels
                     free_kernels_bool_vector[dependencies[i].second] = true;
                     num_of_free_kernels++;
                 }
@@ -77,7 +76,7 @@ bool topological_sort(Dependence dependencies[], const size_t num_of_dependencie
         const size_t num_of_dependencies = 3; //8; /* number of dependencies */
         const size_t num_of_kernels = 4;//8; /* number of kernels */
         Dependence dependencies[num_of_dependencies]; // vector for kernel dependencies
-        std::vector<size_t> resolved;
+        std::vector<int> resolved;
         size_t index = 0;
 
         // Dependencies should be determined by an analyse phase on kernels
