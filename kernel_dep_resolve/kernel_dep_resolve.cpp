@@ -34,7 +34,7 @@ bool topological_sort(Dependence dependencies[], size_t num_of_dependencies, siz
     size_t kernel, a, num_of_free_kernels, resolved_size = 0,
            remaining_dependencies = num_of_dependencies;
 
-    /* All arcs start off in the graph */
+    /* in the begining all dependencies are marked */
     for (a = 0; a < num_of_dependencies; a++ ) {
         dependency_bool_vector[a]=true;
     }
@@ -50,15 +50,14 @@ bool topological_sort(Dependence dependencies[], size_t num_of_dependencies, siz
         /* Add it to the resolved array */
         resolved.emplace_back(kernel);
         resolved_size++;
-        /* Remove all arcs connecting it to its neighbours */
+        /* Remove all dependencies with other kernels */
         for (a = 0; a < num_of_dependencies; a++) {
-            //for (auto elem : dependency_bool_vector) {
             if (dependency_bool_vector[a] && dependencies[a].first == kernel) {
                 dependency_bool_vector[a] = false;
                 remaining_dependencies--;
-                /* Check if neighbour is now a root */
+                /* Check if other kernels are free now */
                 if (is_free_kernel(dependencies, dependency_bool_vector, num_of_dependencies, dependencies[a].second)) {
-                    /* Add it to set of vertices */
+                    /* Add it to set of free kernels */
                     free_kernels_bool_vector[dependencies[a].second] = true;
                     num_of_free_kernels++;
                 }
@@ -92,7 +91,7 @@ bool topological_sort(Dependence dependencies[], size_t num_of_dependencies, siz
         //kernel_dependency(dependencies, 5, 7, index);
         //kernel_dependency(dependencies, 5, 7, index);
 
-        //Passing vector of dependencies
+        //Passing array of dependencies
         if ( topological_sort(dependencies, num_of_dependencies, num_of_kernels, resolved))
             std::cout<< "No cycles between kernels"<< std::endl;
         else
