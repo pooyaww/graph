@@ -67,7 +67,7 @@ bool topological_sort(Dependence dependencies[0], const size_t num_of_dependenci
 
 static void kernel_dependency(Dependence dependencies[],const size_t from, const size_t to, size_t& index) {
     dependencies[index] = std::make_pair(from, to);
-    //std::cout << dependencies[index].first << " ----> " << dependencies[index].second << std::endl;
+    std::cout << dependencies[index].first << " ----> " << dependencies[index].second << std::endl;
     index++;
 }
 
