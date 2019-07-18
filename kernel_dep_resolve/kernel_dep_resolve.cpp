@@ -74,7 +74,7 @@ bool topological_sort(Dependence dependencies[], const size_t num_of_dependencie
 
     int main(void) {
         const size_t num_of_dependencies = 3; //8; /* number of dependencies */
-        const size_t num_of_kernels = 3;//8; /* number of kernels */
+        const size_t num_of_kernels = 4;//8; /* number of kernels */
         Dependence dependencies[num_of_dependencies]; // vector for kernel dependencies
         std::vector<size_t> resolved;
         size_t index = 0;
