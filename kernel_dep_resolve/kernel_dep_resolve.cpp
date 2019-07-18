@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
-#include <utility>
+//#include <utility>
+#include <map>
 
 using Dependence = std::pair<size_t, size_t>; // <from, to>
 
@@ -8,7 +9,7 @@ using Dependence = std::pair<size_t, size_t>; // <from, to>
 static bool is_free_kernel(const Dependence dependencies[], const bool dependency_bool_vector[], const size_t num_of_dependencies,
                            size_t kernel) {
     bool free_kernel = 1;
-    for (int i = 0; i < num_of_dependencies && free_kernel; i++) {
+    for (int i = 0; i < num_of_dependencies && free_kernel; ++i) {
         free_kernel = (!dependency_bool_vector[i])|| (dependencies[i].second != kernel);
     }
     return free_kernel;
@@ -17,8 +18,8 @@ static bool is_free_kernel(const Dependence dependencies[], const bool dependenc
 /* Get the kernels with no dependency (no input from other kernels to those) */
 static size_t get_free_kernels(const Dependence dependencies[], const bool dependency_bool_vector[], const size_t num_of_dependencies,
                                size_t num_of_kernels, bool free_kernels_bool_vector[]) {
-    size_t kernel, num_of_free_kernels = 0;
-    for (kernel = 0; kernel < num_of_kernels; kernel++) {
+    size_t  num_of_free_kernels = 0;
+    for (size_t kernel = 0; kernel < num_of_kernels; ++kernel) {
         if (is_free_kernel(dependencies, dependency_bool_vector, num_of_dependencies, kernel)) {
             free_kernels_bool_vector[kernel] = true;
             num_of_free_kernels++;
@@ -34,7 +35,7 @@ bool topological_sort(Dependence dependencies[], const size_t num_of_dependencie
     size_t remaining_dependencies = num_of_dependencies;
 
     /* in the begining all dependencies are marked */
-    for (int i = 0; i < num_of_dependencies; i++ ) {
+    for (int i = 0; i < num_of_dependencies; ++i ) {
         dependency_bool_vector[i] = true;
     }
     /* Get the kernels with no incoming dependencies */
@@ -42,7 +43,7 @@ bool topological_sort(Dependence dependencies[], const size_t num_of_dependencie
     /* Main loop */
     while (num_of_free_kernels > 0) {
         /* Get first kernel */
-        for (kernel = 0; free_kernels_bool_vector[kernel] != true; kernel++);
+        for (kernel = 0; free_kernels_bool_vector[kernel] != true; ++kernel);
         /* Remove from free_kernels boolean vector */
         free_kernels_bool_vector[kernel] = false;
         num_of_free_kernels--;
@@ -50,7 +51,7 @@ bool topological_sort(Dependence dependencies[], const size_t num_of_dependencie
         resolved.emplace_back(kernel);
         resolved_size++;
         /* Remove all dependencies with other kernels */
-        for (int i = 0; i < num_of_dependencies; i++) {
+        for (int i = 0; i < num_of_dependencies; ++i) {
             if (dependency_bool_vector[i] && dependencies[i].first == kernel) {
                 dependency_bool_vector[i] = false;
                 remaining_dependencies--;
