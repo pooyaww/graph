@@ -8,7 +8,7 @@ std::vector<int> resolve_dependencies(const std::vector<std::vector<int>>& kerne
     std::vector<int> ordered_kernels;
     ordered_kernels.reserve(indegree.size()+1);
     //list to store kernels with indegree 0
-    std::list<int> free_kernels;
+    std::vector<int> free_kernels;
     for (size_t i = 1;  i < indegree.size();  i++) {
         if (indegree[i] == 0)
             free_kernels.push_back(i);
@@ -46,6 +46,7 @@ int main()
         std::cout << std::endl;
     }
     auto const& ordered_kernels = resolve_dependencies(kernels, std::move(indegree));
+    std::cout<< "order: ";
     for (auto kernel: ordered_kernels)
         std::cout << kernel << "  ";
     return 0;
