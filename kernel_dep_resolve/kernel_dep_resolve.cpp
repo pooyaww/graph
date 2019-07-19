@@ -36,7 +36,7 @@ bool topological_sort(Dependencies& dependencies, const size_t num_of_kernels, s
     auto num_of_free_kernels = get_free_kernels(dependencies, dependency_bool_vector, num_of_kernels, free_kernels);
     // Main loop
     while (num_of_free_kernels) {
-        // Remove from free_kernels boolean vector
+        // Remove from free_kernels vector
         auto free = free_kernels.front();
         // Add it to the resolved array
         resolved.emplace_back(free);
