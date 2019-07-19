@@ -14,23 +14,18 @@ static bool is_free_kernel(const Dependencies& dependencies, const bool dependen
 
 // Get the kernels with no dependency (no input from other kernels to those)
 static size_t get_free_kernels(const Dependencies& dependencies, const bool dependency_bool_vector[],
-                               size_t num_of_kernels, bool free_kernels_bool_vector[]) {
-    size_t  num_of_free_kernels = 0;
+                               size_t num_of_kernels, std::vector<size_t>& free_kernels) {
     for (size_t kernel = 0; kernel < num_of_kernels; ++kernel) {
         if (is_free_kernel(dependencies, dependency_bool_vector, kernel)) {
-            free_kernels_bool_vector[kernel] = true;
-            num_of_free_kernels++;
-        } else {
-            free_kernels_bool_vector[kernel] = false;
+            free_kernels.emplace_back(kernel);
         }
     }
-    return num_of_free_kernels;
+    return free_kernels.size();
 }
 
 bool topological_sort(Dependencies& dependencies, const size_t num_of_kernels, std::vector<size_t>& resolved) {
-    bool free_kernels_bool_vector[num_of_kernels];
+    std::vector<size_t> free_kernels;
     bool dependency_bool_vector[dependencies.size()];
-    size_t num_of_free_kernels = 0;
     size_t remaining_dependencies = dependencies.size();
 
     // in the begining all dependencies are marked
@@ -38,30 +33,27 @@ bool topological_sort(Dependencies& dependencies, const size_t num_of_kernels, s
         dependency_bool_vector[i] = true;
     }
     // Get the kernels with no incoming dependencies
-    num_of_free_kernels = get_free_kernels(dependencies, dependency_bool_vector, num_of_kernels, free_kernels_bool_vector);
+    auto num_of_free_kernels = get_free_kernels(dependencies, dependency_bool_vector, num_of_kernels, free_kernels);
     // Main loop
     while (num_of_free_kernels) {
-        // Get first kernel
-        size_t kernel;
-        for (kernel = 0; free_kernels_bool_vector[kernel] != true; ++kernel);
         // Remove from free_kernels boolean vector
-        free_kernels_bool_vector[kernel] = false;
-        num_of_free_kernels--;
+        auto free = free_kernels.front();
         // Add it to the resolved array
-        resolved.emplace_back(kernel);
+        resolved.emplace_back(free);
+        free_kernels.erase(free_kernels.begin());
         // Remove all dependencies with other kernels
         for (size_t i = 0; i < dependencies.size(); ++i) {
-            if (dependency_bool_vector[i] && dependencies[i].first == kernel) {
+            if (dependency_bool_vector[i] && dependencies[i].first == free) {
                 dependency_bool_vector[i] = false;
                 remaining_dependencies--;
                 // Check if other kernels are free now
                 if (is_free_kernel(dependencies, dependency_bool_vector, dependencies[i].second)) {
                     // Add it to set of free kernels
-                    free_kernels_bool_vector[dependencies[i].second] = true;
-                    num_of_free_kernels++;
+                    free_kernels.emplace_back(dependencies[i].second);
                 }
             }
         }
+        num_of_free_kernels = free_kernels.size();
     }
     return remaining_dependencies == 0;
 }
