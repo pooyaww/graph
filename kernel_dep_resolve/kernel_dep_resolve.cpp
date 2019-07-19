@@ -74,10 +74,10 @@ int main(void) {
     dependencies.emplace_back(0, 2);
     dependencies.emplace_back(2, 3);
     dependencies.emplace_back(2, 0);
-    //dependencies.emplace_back(3, 2);
 
     for (auto elem : dependencies)
         std::cout << elem.first << " ----> " << elem.second << std::endl;
+
     std::vector<std::pair<size_t, size_t>> cycle;
     //Passing vector of dependencies
     if (topological_sort(dependencies, num_of_kernels, resolved)) {
@@ -96,7 +96,6 @@ int main(void) {
     }
     for (auto elem : cycle)
         std::cout<< dependencies[elem.first].first << " <---> "  <<dependencies[elem.second].first<< std::endl;
-    // }
 
-        return 0;
-        }
+    return 0;
+}
