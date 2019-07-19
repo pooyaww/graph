@@ -1,5 +1,4 @@
 #include <iostream>
-#include <list>
 #include <vector>
 
 std::vector<int> resolve_dependencies(const std::vector<std::vector<int>>& kernels,
