@@ -72,8 +72,8 @@ static void kernel_dependency(Dependence dependencies[],const size_t from, const
 }
 
 int main(void) {
-    const size_t num_of_dependencies = 3; //8; /* number of dependencies */
-    const size_t num_of_kernels = 4;//8; /* number of kernels */
+    const size_t num_of_dependencies = 3; // number of dependencies
+    const size_t num_of_kernels = 4; // number of kernels
     Dependence dependencies[num_of_dependencies] = {std::make_pair(0,0)}; // vector for kernel dependencies
     std::vector<size_t> resolved;
     size_t index = 0;
