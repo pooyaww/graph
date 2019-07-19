@@ -1,47 +1,46 @@
 #include <iostream>
 #include <vector>
 
-using Dependence = std::pair<size_t, size_t>; // <from, to>
+using Dependencies = std::vector<std::pair<size_t, size_t>>; // <from, to>
 
 // Find out if a kernel has no dependency (no input from other kernels to this one)
-static bool is_free_kernel(const Dependence dependencies[], const bool dependency_bool_vector[], const size_t num_of_dependencies,
-                           size_t kernel) {
+static bool is_free_kernel(const Dependencies& dependencies, const bool dependency_bool_vector[], const size_t kernel) {
     bool free_kernel = true;
-    for (size_t i = 0; i < num_of_dependencies && free_kernel; ++i) {
+    for (size_t i = 0; i < dependencies.size() && free_kernel; ++i) {
         free_kernel = (!dependency_bool_vector[i])|| (dependencies[i].second != kernel);
     }
     return free_kernel;
 }
 
 // Get the kernels with no dependency (no input from other kernels to those)
-static size_t get_free_kernels(const Dependence dependencies[], const bool dependency_bool_vector[], const size_t num_of_dependencies,
+static size_t get_free_kernels(const Dependencies& dependencies, const bool dependency_bool_vector[],
                                size_t num_of_kernels, bool free_kernels_bool_vector[]) {
     size_t  num_of_free_kernels = 0;
     for (size_t kernel = 0; kernel < num_of_kernels; ++kernel) {
-        if (is_free_kernel(dependencies, dependency_bool_vector, num_of_dependencies, kernel)) {
+        if (is_free_kernel(dependencies, dependency_bool_vector, kernel)) {
             free_kernels_bool_vector[kernel] = true;
             num_of_free_kernels++;
         } else {
             free_kernels_bool_vector[kernel] = false;
         }
     }
-return num_of_free_kernels;
+    return num_of_free_kernels;
 }
 
-bool topological_sort(Dependence dependencies[0], const size_t num_of_dependencies, const size_t num_of_kernels, std::vector<size_t>& resolved) {
+bool topological_sort(Dependencies& dependencies, const size_t num_of_kernels, std::vector<size_t>& resolved) {
     bool free_kernels_bool_vector[num_of_kernels];
-    bool dependency_bool_vector[num_of_dependencies];
+    bool dependency_bool_vector[dependencies.size()];
     size_t num_of_free_kernels = 0;
-    size_t remaining_dependencies = num_of_dependencies;
+    size_t remaining_dependencies = dependencies.size();
 
     // in the begining all dependencies are marked
-    for (size_t i = 0; i < num_of_dependencies; ++i ) {
+    for (size_t i = 0; i < dependencies.size(); ++i ) {
         dependency_bool_vector[i] = true;
     }
     // Get the kernels with no incoming dependencies
-    num_of_free_kernels = get_free_kernels(dependencies, dependency_bool_vector, num_of_dependencies, num_of_kernels, free_kernels_bool_vector);
+    num_of_free_kernels = get_free_kernels(dependencies, dependency_bool_vector, num_of_kernels, free_kernels_bool_vector);
     // Main loop
-    while (num_of_free_kernels > 0) {
+    while (num_of_free_kernels) {
         // Get first kernel
         size_t kernel;
         for (kernel = 0; free_kernels_bool_vector[kernel] != true; ++kernel);
@@ -51,12 +50,12 @@ bool topological_sort(Dependence dependencies[0], const size_t num_of_dependenci
         // Add it to the resolved array
         resolved.emplace_back(kernel);
         // Remove all dependencies with other kernels
-        for (size_t i = 0; i < num_of_dependencies; ++i) {
+        for (size_t i = 0; i < dependencies.size(); ++i) {
             if (dependency_bool_vector[i] && dependencies[i].first == kernel) {
                 dependency_bool_vector[i] = false;
                 remaining_dependencies--;
                 // Check if other kernels are free now
-                if (is_free_kernel(dependencies, dependency_bool_vector, num_of_dependencies, dependencies[i].second)) {
+                if (is_free_kernel(dependencies, dependency_bool_vector, dependencies[i].second)) {
                     // Add it to set of free kernels
                     free_kernels_bool_vector[dependencies[i].second] = true;
                     num_of_free_kernels++;
@@ -67,33 +66,22 @@ bool topological_sort(Dependence dependencies[0], const size_t num_of_dependenci
     return remaining_dependencies == 0;
 }
 
-static void kernel_dependency(Dependence dependencies[],const size_t from, const size_t to, size_t& index) {
-    dependencies[index++] = std::make_pair(from, to);
-}
-
 int main(void) {
-    const size_t num_of_dependencies = 3; // number of dependencies
     const size_t num_of_kernels = 4; // number of kernels
-    Dependence dependencies[num_of_dependencies] = {std::make_pair(0,0)}; // vector for kernel dependencies
+    Dependencies dependencies; // vector for kernel dependencies
     std::vector<size_t> resolved;
-    size_t index = 0;
-
     // Dependencies should be determined by an analyse phase on kernels
-    // Making dependencies (making an array of kernel dependencies)
-    kernel_dependency(dependencies, 0, 2, index);
-    kernel_dependency(dependencies, 2, 1, index);
-    kernel_dependency(dependencies, 2, 3, index);
-    //kernel_dependency(dependencies, 2, 4, index);
-    //kernel_dependency(dependencies, 2, 5, index);
-    //kernel_dependency(dependencies, 3, 6, index);
-    //kernel_dependency(dependencies, 5, 7, index);
-    //kernel_dependency(dependencies, 5, 7, index);
+    // Making dependencies (making a kernel of kernel dependencies)
+    dependencies.emplace_back(0, 2);
+    dependencies.emplace_back(0, 1);
+    dependencies.emplace_back(2, 1);
+    dependencies.emplace_back(2, 3);
 
-    for (size_t i = 0; i < index ; i++)
-        std::cout << dependencies[i].first << " ----> " << dependencies[i].second << std::endl;
+    for (auto elem : dependencies)
+        std::cout << elem.first << " ----> " << elem.second << std::endl;
 
-    //Passing array of dependencies
-    if ( topological_sort(dependencies, num_of_dependencies, num_of_kernels, resolved))
+    //Passing vector of dependencies
+    if ( topological_sort(dependencies, num_of_kernels, resolved))
         std::cout<< "No cycles between kernels"<< std::endl;
     else
         std::cout<< "Kernels have circular dependency"<< std::endl;
