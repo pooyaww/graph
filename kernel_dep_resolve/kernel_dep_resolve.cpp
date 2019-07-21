@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <algorithm>
 
 using Dependencies = std::vector<std::pair<size_t, size_t>>; // <from, to>
 
@@ -15,7 +16,7 @@ static bool is_free_kernel(const Dependencies& dependencies, const bool dependen
 
 // Get the kernels with no dependency (no input from other kernels to those)
 static size_t get_free_kernels(const Dependencies& dependencies, const bool dependency_bool_vector[],
-        size_t num_of_kernels, std::stack<size_t>& free_kernels) {
+                               size_t num_of_kernels, std::stack<size_t>& free_kernels) {
     for (size_t kernel = 0; kernel < num_of_kernels; ++kernel) {
         if (is_free_kernel(dependencies, dependency_bool_vector, kernel)) {
             free_kernels.push(kernel);
@@ -64,22 +65,20 @@ bool topological_sort(Dependencies& dependencies, const size_t num_of_kernels, s
 }
 
 int main(void) {
-    const size_t num_of_kernels = 4; // number of kernels
+    const size_t num_of_kernels = 5; // number of kernels
     Dependencies dependencies; // vector for kernel dependencies
     std::vector<size_t> resolved;
     // Dependencies should be determined by an analyse phase on kernels
     // Making dependencies (making a kernel of kernel dependencies)
-    dependencies.emplace_back(0, 1);
-    dependencies.emplace_back(1, 2);
     dependencies.emplace_back(0, 2);
-    dependencies.emplace_back(2, 3);
-    dependencies.emplace_back(2, 0);
+    dependencies.emplace_back(1, 3);
+    dependencies.emplace_back(0, 4);
 
     for (auto elem : dependencies)
         std::cout << elem.first << " ----> " << elem.second << std::endl;
 
     std::vector<std::pair<size_t, size_t>> cycle;
-    //Passing vector of dependencies
+    // Passing vector of dependencies
     if (topological_sort(dependencies, num_of_kernels, resolved)) {
         std::cout<< "No cycles between kernels"<< std::endl;
         for (auto elem : resolved) {
@@ -88,14 +87,19 @@ int main(void) {
         std::cout<<std::endl;
     } else {
         std::cout<< "Kernels have circular dependency"<< std::endl;
-        for (size_t i = 0; i < dependencies.size(); ++i)
-            for (size_t j = i; j < dependencies.size(); ++j)
-                if (dependencies[i].first == dependencies[j].second) {
+        // finding all circles between kernels
+        for (size_t i = 0; i < dependencies.size(); ++i) {
+            for (size_t j = i; j < dependencies.size(); ++j) {
+                if (dependencies[i].first == dependencies[j].second &&
+                    // extra condition to take into account circles in disconnected kernel networks
+                    std::find(cycle.begin(), cycle.end(), dependencies[std::make_pair(i,j).first]) == cycle.end()) {
                     cycle.emplace_back(i,j);
                 }
+            }
+        }
     }
-    for (auto elem : cycle)
+    for (auto elem : cycle) {
         std::cout<< dependencies[elem.first].first << " <---> "  <<dependencies[elem.second].first<< std::endl;
-
+    }
     return 0;
 }
