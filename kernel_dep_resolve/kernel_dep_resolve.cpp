@@ -70,9 +70,12 @@ int main(void) {
     std::vector<size_t> resolved;
     // Dependencies should be determined by an analyse phase on kernels
     // Making dependencies (making a kernel of kernel dependencies)
-    dependencies.emplace_back(0, 2);
+    dependencies.emplace_back(0, 1);
+    dependencies.emplace_back(1, 2);
     dependencies.emplace_back(1, 3);
-    dependencies.emplace_back(0, 4);
+    dependencies.emplace_back(2, 4);
+    dependencies.emplace_back(2, 3);
+    //dependencies.emplace_back(4, 0); //adds a circle
 
     for (auto elem : dependencies)
         std::cout << elem.first << " ----> " << elem.second << std::endl;
