@@ -16,7 +16,7 @@ static bool is_free_kernel(const Dependencies& dependencies, const bool dependen
 
 // Get the kernels with no dependency (no input from other kernels to those)
 static size_t get_free_kernels(const Dependencies& dependencies, const bool dependency_bool_vector[],
-                               size_t num_of_kernels, std::stack<size_t>& free_kernels) {
+                               const size_t num_of_kernels, std::stack<size_t>& free_kernels) {
     for (size_t kernel = 0; kernel < num_of_kernels; ++kernel) {
         if (is_free_kernel(dependencies, dependency_bool_vector, kernel)) {
             free_kernels.push(kernel);
