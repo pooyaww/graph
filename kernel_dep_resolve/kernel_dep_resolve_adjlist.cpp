@@ -6,7 +6,7 @@ std::vector<int> resolve_dependencies(const std::vector<std::vector<int>>& kerne
 {
     std::vector<int> ordered_kernels;
     ordered_kernels.reserve(indegree.size()+1);
-    //list to store kernels with indegree 0
+    // a vector to store kernels with indegree 0
     std::vector<int> free_kernels;
     for (size_t i = 1;  i < indegree.size();  i++) {
         if (indegree[i] == 0)
