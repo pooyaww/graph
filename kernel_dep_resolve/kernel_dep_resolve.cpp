@@ -3,7 +3,7 @@
 #include <stack>
 #include <algorithm>
 
-using Dependencies = std::vector<std::pair<size_t, size_t>>; // <from, to>
+using Dependencies = std::vector<std::pair<size_t, size_t>>; // <From, To>
 
 // Find out if a kernel has no dependency (no input from other kernels to this one)
 static bool is_free_kernel(const Dependencies& dependencies, const bool dependency_bool_vector[], const size_t kernel) {
@@ -72,9 +72,8 @@ int main(void) {
     // Making dependencies (making a kernel of kernel dependencies)
     dependencies.emplace_back(0, 1);
     dependencies.emplace_back(1, 2);
-    dependencies.emplace_back(1, 3);
-    dependencies.emplace_back(2, 4);
     dependencies.emplace_back(2, 3);
+    dependencies.emplace_back(3, 4);
     //dependencies.emplace_back(4, 0); //adds a circle
 
     for (auto elem : dependencies)
