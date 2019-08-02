@@ -74,7 +74,7 @@ int main(void) {
     dependencies.emplace_back(1, 2);
     dependencies.emplace_back(2, 3);
     dependencies.emplace_back(3, 4);
-    //dependencies.emplace_back(4, 0); //adds a circle
+    dependencies.emplace_back(4, 0); //adds a circle
 
     for (auto elem : dependencies)
         std::cout << elem.first << " ----> " << elem.second << std::endl;
@@ -94,7 +94,7 @@ int main(void) {
             for (size_t j = i; j < dependencies.size(); ++j) {
                 if (dependencies[i].first == dependencies[j].second &&
                     // extra condition to take into account circles in disconnected kernel networks
-                    std::find(cycle.begin(), cycle.end(), dependencies[std::make_pair(i,j).first]) == cycle.end()) {
+                    std::find(cycle.begin(), cycle.end(), dependencies[i]) == cycle.end()) {
                     cycle.emplace_back(i,j);
                 }
             }
