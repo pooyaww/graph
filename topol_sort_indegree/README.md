@@ -20,6 +20,6 @@ else
     return L (a topologically  sorted  order)
 ```
 ##### Explaination
-    1. Find a noden with no unsatisfied dependencies (incomingedges).
-    2. “Compile” n and “remove” it from it’s dependents.
+    1. Find a node n with no unsatisfied dependencies (incomingedges).
+    2. “Compile” n and “remove” it from its dependents.
     3. If nodes have not been “compiled“ goto 1.  
